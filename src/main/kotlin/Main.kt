@@ -24,8 +24,37 @@ var sumVKPayOfMonth = 0
 var sumVKPayOfDay = 0
 
 fun main(args: Array<String>) {
+    println(transfer(MASTERCARD, 35_356_21))
+    println(transfer(MASTERCARD, 85_694_36))
+    println(transfer(MASTERCARD, 65_356_85))
+    sumMastercardOfDay = 0
+    println(transfer(MASTERCARD, 10_000_00))
+    println(transfer(MASTERCARD, 655_356_85))
+    println(transfer(MAESTRO, 35_356_21))
+    println(transfer(MAESTRO, 85_694_36))
+    println(transfer(MAESTRO, 65_356_85))
+    sumMaestroOfDay = 0
+    println(transfer(MAESTRO, 10_000_00))
+    println(transfer(MAESTRO, 655_356_85))
+    println(transfer(VISA, 25_21))
+    println(transfer(VISA, 35_356_21))
+    println(transfer(VISA, 85_694_36))
+    println(transfer(VISA, 65_356_85))
+    sumVisaOfDay = 0
+    println(transfer(VISA, 10_000_00))
+    println(transfer(VISA, 655_356_85))
+    println(transfer(WORLD, 25_21))
+    println(transfer(WORLD, 35_356_21))
+    println(transfer(WORLD, 85_694_36))
+    println(transfer(WORLD, 65_356_85))
+    sumWorldOfDay = 0
+    println(transfer(WORLD, 10_000_00))
+    println(transfer(WORLD, 655_356_85))
     println(transfer(transfer = 10_335_00))
     println(transfer(transfer = 5_335_00))
+    sumVKPayOfDay = 0
+    println(transfer(transfer = 5_335_00))
+    println(transfer(transfer = 36_335_00))
 }
 
 fun calcCommission(card: String, transfer: Int) : Int{
