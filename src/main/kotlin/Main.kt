@@ -5,6 +5,7 @@ const val WORLD = "Мир"
 const val VK_PAY = "VK Pay"
 const val COINS = 100
 const val COMMISSION_MASTERCARD_MAESTRO = 0.6
+const val COMMISSION_VISA_WORLD = 0.75
 const val LIMIT_ON_DAY = 150_000_00
 const val LIMIT_ON_MONTH = 600_000_00
 const val NO_COMMISSION = 75_000_00
@@ -15,9 +16,13 @@ var sumMastercardOfMonth = 0
 var sumMaestroOfMonth = 0
 var sumMastercardOfDay = 0
 var sumMaestroOfDay = 0
+var sumVisaOfMonth = 0
+var sumVisaOfDay = 0
+var sumWorldOfMonth = 0
+var sumWorldOfDay = 0
 
 fun main(args: Array<String>) {
-    println(transfer(MASTERCARD, 85_267_35))
+    println(transfer(WORLD, 85_335_00))
 }
 
 fun calcCommission(card: String, transfer: Int) : Int{
@@ -36,11 +41,25 @@ fun calcCommission(card: String, transfer: Int) : Int{
             println("\nПревышен лимит переводов по карте $card в месяц")
             0
         }
+        VISA -> //Проверяем лимит переводов в месяц
+            if (transfer + sumVisaOfMonth < LIMIT_ON_MONTH) {
+                transferVisa(card, transfer)
+            } else {
+                println("\nПревышен лимит переводов по карте $card в месяц")
+                0
+            }
+        WORLD -> //Проверяем лимит переводов в месяц
+            if (transfer + sumVisaOfMonth < LIMIT_ON_MONTH) {
+                transferWorld(card, transfer)
+            } else {
+                println("\nПревышен лимит переводов по карте $card в месяц")
+                0
+            }
         else -> {
             0
         }
     }
-    return sum
+    return sum  //Возврат суммы перевода
 }
 
 
@@ -69,18 +88,18 @@ fun transferMastercard(card: String, transfer: Int) : Int {
             if (sumMastercardOfMonth <= NO_COMMISSION) {
                 sumMastercardOfDay += transfer
                 sumMastercardOfMonth += transfer
-                commission = if (sumMastercardOfMonth - NO_COMMISSION > 0) {//Расчет коммиссии с учетом безпроцентной суммы
+                commission = if (sumMastercardOfMonth - NO_COMMISSION > 0) {//Расчет комиссии с учетом безпроцентной суммы
                     ((sumMastercardOfMonth - NO_COMMISSION) * COMMISSION_MASTERCARD_MAESTRO).toInt() + 20_00
                 } else {
                     0
                 }
-            } else {//Расчет коммиссии без учета безпроцентной суммы
+            } else {//Расчет комиссии без учета безпроцентной суммы
                 sumMastercardOfDay += transfer
                 sumMastercardOfMonth += transfer
                 commission = (transfer * COMMISSION_MASTERCARD_MAESTRO).toInt() + 20_00
             }
         }
-    return commission + transfer
+    return commission + transfer //Возврат суммы перевода
 }
 
 fun transferMaestro(card: String, transfer: Int) : Int {
@@ -93,16 +112,44 @@ fun transferMaestro(card: String, transfer: Int) : Int {
         if (sumMaestroOfMonth <= NO_COMMISSION) {
             sumMaestroOfDay += transfer
             sumMaestroOfMonth += transfer
-            commission = if (sumMaestroOfMonth - NO_COMMISSION > 0) {//Расчет коммиссии с учетом безпроцентной суммы
+            commission = if (sumMaestroOfMonth - NO_COMMISSION > 0) {//Расчет комиссии с учетом безпроцентной суммы
                 ((sumMaestroOfMonth - NO_COMMISSION) * COMMISSION_MASTERCARD_MAESTRO).toInt() + 20_00
             } else {
                 0
             }
-        } else {//Расчет коммиссии без учета безпроцентной суммы
+        } else {//Расчет комиссии без учета безпроцентной суммы
             sumMaestroOfDay += transfer
             sumMaestroOfMonth += transfer
             commission = (transfer * COMMISSION_MASTERCARD_MAESTRO).toInt() + 20_00
         }
     }
-    return commission + transfer
+    return commission + transfer //Возврат суммы перевода
+}
+
+fun transferVisa(card: String, transfer: Int) : Int {
+    var commission = 0
+    //Проверяем лимит переводов в сутки
+    if (sumVisaOfDay + transfer > LIMIT_ON_DAY) {
+        println("\nПревышен лимит переводов по карте $card в сутки")
+        return 0
+    } else {
+        sumVisaOfDay += transfer
+        sumVisaOfMonth += transfer
+        commission = (transfer * COMMISSION_VISA_WORLD).toInt() //Расчет комиссии
+    }
+    return if (commission > MIN_COMMISSION ) commission + transfer else transfer + MIN_COMMISSION //Возврат суммы перевода
+}
+
+fun transferWorld(card: String, transfer: Int) : Int {
+    var commission = 0
+    //Проверяем лимит переводов в сутки
+    if (sumWorldOfDay + transfer > LIMIT_ON_DAY) {
+        println("\nПревышен лимит переводов по карте $card в сутки")
+        return 0
+    } else {
+        sumWorldOfDay += transfer
+        sumWorldOfMonth += transfer
+        commission = (transfer * COMMISSION_VISA_WORLD).toInt() //Расчет комиссии
+    }
+    return if (commission > MIN_COMMISSION ) commission + transfer else transfer + MIN_COMMISSION //Возврат суммы перевода
 }
