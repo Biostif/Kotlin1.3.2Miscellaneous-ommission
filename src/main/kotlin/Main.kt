@@ -20,9 +20,12 @@ var sumVisaOfMonth = 0
 var sumVisaOfDay = 0
 var sumWorldOfMonth = 0
 var sumWorldOfDay = 0
+var sumVKPayOfMonth = 0
+var sumVKPayOfDay = 0
 
 fun main(args: Array<String>) {
-    println(transfer(WORLD, 85_335_00))
+    println(transfer(transfer = 10_335_00))
+    println(transfer(transfer = 5_335_00))
 }
 
 fun calcCommission(card: String, transfer: Int) : Int{
@@ -55,6 +58,13 @@ fun calcCommission(card: String, transfer: Int) : Int{
                 println("\nПревышен лимит переводов по карте $card в месяц")
                 0
             }
+        VK_PAY -> //Проверяем лимит переводов в месяц
+            if (transfer + sumVKPayOfMonth < LIMIT_ON_MONTH_VK) {
+                transferVKPay(card, transfer)
+            } else {
+                println("\nПревышен лимит переводов по карте $card в месяц")
+                -1
+            }
         else -> {
             0
         }
@@ -69,6 +79,10 @@ fun transfer(card: String = VK_PAY, transfer: Int) : String {
         "\nПо карте $card максимальный месячный лимит: " +
                 "${LIMIT_ON_MONTH/COINS} Руб. ${LIMIT_ON_MONTH%COINS} коп. " +
                 "\nМаксимальный дневной лимит: ${LIMIT_ON_DAY/COINS} Руб. ${LIMIT_ON_DAY%COINS} коп. "
+    } else if(sum == -1) {
+        "\nПо карте $card максимальный месячный лимит: " +
+                "${LIMIT_ON_MONTH_VK/COINS} Руб. ${LIMIT_ON_MONTH_VK%COINS} коп. " +
+                "\nМаксимальный дневной лимит: ${LIMIT_ON_DAY_VK/COINS} Руб. ${LIMIT_ON_DAY_VK%COINS} коп. "
     } else {
         "\nПеревод по карте $card" +
                 "\nСумма перевода составит: ${sum / COINS} Руб. " +
@@ -83,7 +97,7 @@ fun transferMastercard(card: String, transfer: Int) : Int {
         //Проверяем лимит переводов в сутки
         if (sumMastercardOfDay + transfer > LIMIT_ON_DAY) {
             println("\nПревышен лимит переводов по карте $card в сутки")
-            return 0
+            return 0 //Возвращает 0 для функции transfer
         } else {  //Проверяем сумму перевода без процентов
             if (sumMastercardOfMonth <= NO_COMMISSION) {
                 sumMastercardOfDay += transfer
@@ -107,7 +121,7 @@ fun transferMaestro(card: String, transfer: Int) : Int {
     //Проверяем лимит переводов в сутки
     if (sumMaestroOfDay + transfer > LIMIT_ON_DAY) {
         println("\nПревышен лимит переводов по карте $card в сутки")
-        return 0
+        return 0 //Возвращает 0 для функции transfer
     } else {//Проверяем сумму перевода без процентов
         if (sumMaestroOfMonth <= NO_COMMISSION) {
             sumMaestroOfDay += transfer
@@ -131,7 +145,7 @@ fun transferVisa(card: String, transfer: Int) : Int {
     //Проверяем лимит переводов в сутки
     if (sumVisaOfDay + transfer > LIMIT_ON_DAY) {
         println("\nПревышен лимит переводов по карте $card в сутки")
-        return 0
+        return 0 //Возвращает 0 для функции transfer
     } else {
         sumVisaOfDay += transfer
         sumVisaOfMonth += transfer
@@ -145,11 +159,23 @@ fun transferWorld(card: String, transfer: Int) : Int {
     //Проверяем лимит переводов в сутки
     if (sumWorldOfDay + transfer > LIMIT_ON_DAY) {
         println("\nПревышен лимит переводов по карте $card в сутки")
-        return 0
+        return 0 //Возвращает 0 для функции transfer
     } else {
         sumWorldOfDay += transfer
         sumWorldOfMonth += transfer
         commission = (transfer * COMMISSION_VISA_WORLD).toInt() //Расчет комиссии
     }
     return if (commission > MIN_COMMISSION ) commission + transfer else transfer + MIN_COMMISSION //Возврат суммы перевода
+}
+
+fun transferVKPay(card: String, transfer: Int) : Int {
+    //Проверяем лимит переводов в сутки
+    if (sumVKPayOfDay + transfer > LIMIT_ON_DAY_VK) {
+        println("\nПревышен лимит переводов по карте $card в сутки")
+        return -1 //Возвращает -1 для функции transfer
+    } else {
+        sumVKPayOfDay += transfer
+        sumVKPayOfMonth += transfer
+    }
+    return transfer
 }
